@@ -23,18 +23,20 @@ async function run() {
       form.append(key, value)
     }
 
-
     if (name && file) {
-      form.append(name, fs.createReadStream(file));
+      form.append("name", name);
+      form.append("attachment", fs.createReadStream(file));
     }
 
-    const response = await axios({
+     const response = await axios({
       method: 'POST',
       url: url,
-      headers: { 'Content-Type': 'multipart/form-data', ...headers },
+      maxContentLength: 134217728,
+      maxBodyLength: 134217728,
+      headers: { 'Content-Type': 'multipart/form-data; boundary='+form.getBoundary(), ...headers },
       data: form,
     })
-    
+
     console.log(response)
 
     core.setOutput('response', { 'statusCode': response.statusCode, 'data': response.data });
